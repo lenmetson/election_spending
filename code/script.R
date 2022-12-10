@@ -1,5 +1,19 @@
-library(tidyverse)
-library(here)
+# Install and/or load packages 
+
+magic_library <- function(x) {
+  y <- x %in% rownames(installed.packages())
+  if(any(!y)) install.packages(x[!y])
+  invisible(lapply(x, library, character.only=T))
+  rm(x, y)
+}
+  
+magic_library(c(
+          "here",
+          "tidyverse"))
+
+rm(magic_library)
+
+# Download data 
 
 data_url <- "http://search.electoralcommission.org.uk/api/csv/Spending?start={start}&rows={pageSize}&query=&sort=DateIncurred&order=asc&et=pp&date=&from=&to=&rptPd=&prePoll=false&postPoll=false&period=3696&isIrishSourceYes=true&isIrishSourceNo=true&includeOutsideSection75=true"
 
@@ -7,6 +21,7 @@ download.file(data_url, here("data_raw", "2019GE.csv"))
 
 data <- read.csv(here("data_raw", "2019GE.csv"))
 
+# Clean data 
 
 data$TotalExpenditure <- gsub("£", "", data$TotalExpenditure) 
 data$TotalExpenditure <- as.numeric(data$TotalExpenditure)
@@ -17,15 +32,13 @@ data$DateIncurred %>% head()
 data$DateIncurred <- as.Date(data$DateIncurred, format = "%d/%m/%Y")
 data$DateIncurred %>% head()
 
-
+# Create relative date variable 
 
 election_date19 <- as.Date("2019-12-12")
 
 data$relative_DateIncurred <- difftime(data$DateIncurred, election_date19, units = "days")
 
-head(data$relative_DateIncurred)
-
-
+# Plot overall day spend by party 
 
 day_spend_party_plot <-  data %>%
     filter(between(DateIncurred, as.Date('2019-10-01'), as.Date('2019-12-31'))) %>%
@@ -50,10 +63,10 @@ day_spend_party_plot <-  data %>%
     
 day_spend_party_plot
 
-ggsave("day_spend_party_plot.pdf", day_spend_party_plot)
+ggsave(here("output","day_spend_party_plot.pdf")), day_spend_party_plot)
 
 
-
+# Plot daily spending by type 
 
 mainpartyplot_by_type <- data %>% 
     filter(between(DateIncurred, as.Date('2019-01-01'), as.Date('2019-12-31'))) %>%
@@ -81,9 +94,10 @@ mainpartyplot_by_type <- data %>%
 mainpartyplot_by_type
 
 
-ggsave("mainpartyplot_by_type.pdf", mainpartyplot_by_type,
+ggsave(here("output","mainpartyplot_by_type.pdf")), mainpartyplot_by_type,
 height = 15, width = 20)
 
+# Plot daily spending on advertising by party 
 
 ad_plot_party <- data %>% 
     filter(between(DateIncurred, as.Date('2019-06-12'), as.Date('2019-12-31'))) %>%
@@ -112,5 +126,8 @@ ad_plot_party <- data %>%
 
 ad_plot_party
 
-ggsave("ad_plot_party.pdf", ad_plot_party,
+ggsave(here("output", "ad_plot_party.pdf"), ad_plot_party,
+height = 8, width = 12)
+
+ggsave(here("output", "ad_plot_party.png"), ad_plot_party,
 height = 8, width = 12)
