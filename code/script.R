@@ -63,7 +63,7 @@ day_spend_party_plot <-  data %>%
     
 day_spend_party_plot
 
-ggsave(here("output","day_spend_party_plot.pdf")), day_spend_party_plot)
+ggsave(here("output","day_spend_party_plot.pdf"), day_spend_party_plot)
 
 
 # Plot daily spending by type 
@@ -94,7 +94,7 @@ mainpartyplot_by_type <- data %>%
 mainpartyplot_by_type
 
 
-ggsave(here("output","mainpartyplot_by_type.pdf")), mainpartyplot_by_type,
+ggsave(here("output","mainpartyplot_by_type.pdf"), mainpartyplot_by_type,
 height = 15, width = 20)
 
 # Plot daily spending on advertising by party 
