@@ -15,27 +15,25 @@ rm(magic_library)
 
 # Download data 
 
-data_url <- "http://search.electoralcommission.org.uk/api/csv/Spending?start={start}&rows={pageSize}&query=&sort=DateIncurred&order=asc&et=pp&date=&from=&to=&rptPd=&prePoll=false&postPoll=false&period=3696&isIrishSourceYes=true&isIrishSourceNo=true&includeOutsideSection75=true"
+data_url <- "http://search.electoralcommission.org.uk/api/csv/Spending?start={start}&rows={pageSize}&query=&sort=DateIncurred&order=asc&et=pp&date=&from=&to=&rptPd=&prePoll=false&postPoll=false&period=3696&isIrishSourceYes=true&isIrishSourceNo=true&includeOutsideSection75=true" # url is to a queried csv download link from the Electoral Commission's website
 
-download.file(data_url, here("data_raw", "2019GE.csv"))
+download.file(data_url, here("data_raw", "2019GE.csv")) # Download the csv into our working directory
 
-data <- read.csv(here("data_raw", "2019GE.csv"))
+data <- read.csv(here("data_raw", "2019GE.csv")) # Read in the data
 
-# Clean data 
+# Clean data: the dataset comes with all variables encoded as characters 
 
-data$TotalExpenditure <- gsub("£", "", data$TotalExpenditure) 
-data$TotalExpenditure <- as.numeric(data$TotalExpenditure)
+# Convert Expenditure variable to numeric 
+data$TotalExpenditure <- gsub("£", "", data$TotalExpenditure) # Remove £ symbol so we can convert it to numeric 
+data$TotalExpenditure <- as.numeric(data$TotalExpenditure) # Convert to numeric 
 
-
-class(data$DateIncurred)
-data$DateIncurred %>% head()
+# Convert Date incurred variable to date 
 data$DateIncurred <- as.Date(data$DateIncurred, format = "%d/%m/%Y")
-data$DateIncurred %>% head()
+
 
 # Create relative date variable 
 
-election_date19 <- as.Date("2019-12-12")
-
+election_date19 <- as.Date("2019-12-12") # Set date to be relative to 
 data$relative_DateIncurred <- difftime(data$DateIncurred, election_date19, units = "days")
 
 # Plot daily spending on advertising by party 
